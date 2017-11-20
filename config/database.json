@@ -1,0 +1,12 @@
+{
+  "development" : {
+    "region" : "",
+    "endpoint" : ""
+  },
+  "test" : {
+    
+  },
+  "production" : {
+    
+  }
+}
