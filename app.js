@@ -1,12 +1,11 @@
 const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
-const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv')
 const Routes = require('./routes/routes')
-const fs = require('fs')
+const MorganLogger = require('./lib/morgan-logger')
 
 function webapp() {
   const app = express();
@@ -23,17 +22,7 @@ function webapp() {
 
   // uncomment after placing your favicon in /public
   //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-  // create a write stream (in append mode)
-  let logDirectory = path.join(__dirname, 'log')
-  fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
-  let accessLogStream = fs.createWriteStream(path.join(logDirectory, mode + '.log'), {flags: 'a'})
-  //add tokens
-  logger.token('host', function(req) {return "host-ip: 127.0.0.0"})
-  logger.token('pid', function(req){return "PID: "+ process.pid})
-  logger.token('reqId', function(req) { return "reqId: "+ req.id});
-  logger.token('date', function(req) { return new Date().toISOString();});
-  app.use(logger('[:host :pid :date] [:remote-addr :remote-user :reqId HTTP/:http-version :url :method :referrer ] [:status ]', {stream: accessLogStream}));
-
+  app.use(MorganLogger(mode));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(cookieParser());
