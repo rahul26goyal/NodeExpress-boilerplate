@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var app = require('../app');
+var webapp = require('../app');
 var debug = require('debug')('myexpressapp2:server');
 const chalk = require('chalk');
 //var http = require('http');
@@ -12,28 +12,8 @@ const chalk = require('chalk');
 /**
  * Get port from environment and store in Express.
  */
-
+app = webapp()
 app.listen(app.get('port'), () => {
   console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), app.get('port'), app.get('env'));
   console.log('  Press CTRL-C to stop\n');
 });
-
-/**
- * Normalize a port into a number, string, or false.
- */
-
-function normalizePort(val) {
-  var port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
-
-  if (port >= 0) {
-    // port number
-    return port;
-  }
-
-  return false;
-}
