@@ -4,11 +4,14 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-
+const dotenv = require('dotenv')
 const Routes = require('./routes/routes')
 
 function webapp() {
   const app = express();
+  //set env variables
+  dotenv.load({path : './config/.env.' + process.env.NODE_ENV})
+  //console.log("Environment var:::", process.env.AWS_ACCESS_KEY)
 
   //app setup
   app.set('host', process.env.QUBOLE_LOGINHOST || '0.0.0.0');
