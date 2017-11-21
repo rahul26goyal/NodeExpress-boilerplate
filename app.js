@@ -27,7 +27,13 @@ function webapp() {
   let logDirectory = path.join(__dirname, 'log')
   fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
   let accessLogStream = fs.createWriteStream(path.join(logDirectory, mode + '.log'), {flags: 'a'})
-  app.use(logger('combined', {stream: accessLogStream}));
+  //add tokens
+  logger.token('host', function(req) {return "host-ip: 127.0.0.0"})
+  logger.token('pid', function(req){return "PID: "+ process.pid})
+  logger.token('reqId', function(req) { return "reqId: "+ req.id});
+  logger.token('date', function(req) { return new Date().toISOString();});
+  app.use(logger('[:host :pid :date] [:remote-addr :remote-user :reqId HTTP/:http-version :url :method :referrer ] [:status ]', {stream: accessLogStream}));
+
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(cookieParser());
