@@ -6,11 +6,13 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv')
 const Routes = require('./routes/routes')
+const fs = require('fs')
 
 function webapp() {
   const app = express();
   //set env variables
-  dotenv.load({path : './config/.env.' + process.env.NODE_ENV})
+  let mode = process.env.NODE_ENV
+  dotenv.load({path : './config/.env.' + mode})
   //console.log("Environment var:::", process.env.AWS_ACCESS_KEY)
 
   //app setup
@@ -21,7 +23,11 @@ function webapp() {
 
   // uncomment after placing your favicon in /public
   //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-  app.use(logger('dev'));
+  // create a write stream (in append mode)
+  let logDirectory = path.join(__dirname, 'log')
+  fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
+  let accessLogStream = fs.createWriteStream(path.join(logDirectory, mode + '.log'), {flags: 'a'})
+  app.use(logger('combined', {stream: accessLogStream}));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(cookieParser());
