@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const dotenv = require('dotenv')
 const Routes = require('./routes/routes')
 const MorganLogger = require('./lib/morgan-logger')
-
+const assignID = require('./lib/middleware/request_id')
 function webapp() {
   const app = express();
   //set env variables
@@ -22,6 +22,7 @@ function webapp() {
 
   // uncomment after placing your favicon in /public
   //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+  app.use(assignID())
   app.use(MorganLogger(mode));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
