@@ -1,45 +1,77 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const dotenv = require('dotenv')
+const Routes = require('./routes/routes')
+const MorganLogger = require('./lib/morgan-logger')
+const assignID = require('./lib/middleware/request_id')
+function webapp() {
+  const app = express();
+  //set env variables
+  let mode = process.env.NODE_ENV
+  dotenv.load({path : './config/.env.' + mode})
+  //console.log("Environment var:::", process.env.AWS_ACCESS_KEY)
 
-var Routes = require('./routes/routes')
+  //app setup
+  app.set('host', process.env.QUBOLE_LOGINHOST || '0.0.0.0');
+  app.set('port', normalizePort(process.env.PORT || process.env.QUBOLE_LOGINHPOST || '3000'));
+  app.set('views', path.join(__dirname, 'views'));
+  app.set('view engine', 'pug');
 
-var app = express();
+  // uncomment after placing your favicon in /public
+  //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+  app.use(assignID())
+  app.use(MorganLogger(mode));
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(cookieParser());
+  app.use(express.static(path.join(__dirname, 'public')));
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+  //console.log("Routes:::", Routes)
+  //app.get('/', )
+  let routes = new Routes(app, {})
+  // catch 404 and forward to error handler
+  app.use(function(req, res, next) {
+    let err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+  });
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+  // error handler
+  app.use(function(err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-//console.log("Routes:::", Routes)
-//app.get('/', )
-var routes = new Routes(app, {})
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
+  });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  //returnt the app object
+  return app;
+}
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+/**
+ * Normalize a port into a number, string, or false.
+ */
 
-module.exports = app;
+function normalizePort(val) {
+  let port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+module.exports = webapp;
