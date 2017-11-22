@@ -5,12 +5,16 @@
       "script" : "./bin/www",
       "env" : {
         "watch" : true,
-        "NODE_ENV" : "development"
+        "NODE_ENV" : "development",
+        "error_file" : "./log/development_error.log",
+        "out_file" : "./log/development_out.log"  
       },
       "env_production" : {
         "NODE_ENV" : "production",
         "exec_mode" : "cluster",
-        "instances" : "max"
+        "instances" : "max",
+        "error_file" : "./log/production_error.log",
+        "out_file" : "./log/production_out.log"
       }
     }
   ]
