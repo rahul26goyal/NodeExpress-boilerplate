@@ -5,7 +5,9 @@
   "author": "Rahul Goyal <rahulg@qubol.com> <goyal.1234rahul@gmail.com",
   "scripts": {
     "start": "node ./bin/www",
-    "devstart": "NODE_ENV=development nodemon ./bin/www"
+    "devstart": "NODE_ENV=development nodemon ./bin/www",
+    "pm2devmode": "pm2 start ./config/pm2_process.json",
+    "pm2devmode": "pm2 start ./config/pm2_process.json --env=production"
   },
   "dependencies": {
     "body-parser": "~1.18.2",

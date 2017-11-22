@@ -1,0 +1,17 @@
+{
+  "apps" : [
+    {
+      "name" : "app1",
+      "script" : "./bin/www",
+      "env" : {
+        "watch" : true,
+        "NODE_ENV" : "development"
+      },
+      "env_production" : {
+        "NODE_ENV" : "production",
+        "exec_mode" : "cluster",
+        "instances" : "max"
+      }
+    }
+  ]
+}
